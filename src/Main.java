@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class Main {
     /**
@@ -47,7 +48,12 @@ public class Main {
      * @return The column vector from the non-basic matrix corresponding to maxDeltaColumnIndex.
      */
     private static Matrix enteringVector(Matrix nonBasicMatrix, int maxDeltaColumnIndex) {
-        return null;
+        Matrix enteringVector = new Matrix(nonBasicMatrix.getRows(), 1);
+        for (int i = 0; i < enteringVector.getRows(); i++){
+            enteringVector.setElement(i, 0, nonBasicMatrix.getElement(i, maxDeltaColumnIndex));
+        }
+
+        return enteringVector;
     }
 
     /**
@@ -57,7 +63,12 @@ public class Main {
      * @return Vector of ratios (basisVectorsValues)/(denominatorsForRatios).
      */
     private static Matrix calculateRatios(Matrix basisVectorsValues, Matrix denominatorsForRatios) {
-        return null;
+        Matrix ratios = new Matrix(basisVectorsValues.getRows(), 1);
+        for (int i = 0; i < ratios.getRows(); i++){
+            ratios.setElement(i, 0, basisVectorsValues.getElement(i, 0) /
+                    denominatorsForRatios.getElement(i, 0));
+        }
+        return ratios;
     }
 
     /**
@@ -160,24 +171,47 @@ public class Main {
 
     public static void main(String[] args) {
 
+        Scanner in = new Scanner(System.in);
+
 
 
         Matrix coefficients = new Matrix(6, 1); //c
+
+        for (int i = 0; i < coefficients.getRows(); i++){
+            coefficients.setElement(i, 0, in.nextFloat());
+        }
+
+
         Matrix constraintsMatrix = new Matrix(4,6); //A
+
+        for (int i = 0; i < constraintsMatrix.getRows(); i++){
+            for (int j = 0; j < constraintsMatrix.getColumns(); j++){
+                constraintsMatrix.setElement(i, j, in.nextFloat());
+            }
+        }
+
         Matrix rightNumbers = new Matrix(4, 1); //b
+
+        for (int i = 0; i < rightNumbers.getRows(); i++){
+            rightNumbers.setElement(i, 0, in.nextFloat());
+        }
+
+
+
+
 
         Matrix basisMatrix = basisMatrix(constraintsMatrix); //B
         Matrix nonBasicMatrix = nonBasicMatrix(constraintsMatrix); // P
         Matrix inverseBasisMatrix = basisMatrix.inverse(); // B^-1
         Matrix basisCoefficients = basisCoefficients(constraintsMatrix, coefficients); //Cb
         Matrix nonBasicCoefficients = nonBasicCoefficients(coefficients, basisCoefficients); //Cp
-        Matrix basisVectorsValues = inverseBasisMatrix.multiply(rightNumbers); //XB
+        Matrix basisVectorsValues = Matrix.multiply(inverseBasisMatrix, rightNumbers); //XB
         List<Integer> basisVectorsIndices = basisVectorsIndices(constraintsMatrix); //XBi
         List<Integer> nonBasicVectorsIndices = nonBasisVectorsIndices(constraintsMatrix); // XPi
-        double answer = basisCoefficients.multiply(basisVectorsValues).getElement(0, 0); //z
-        Matrix inverseBasisCoefficients = basisCoefficients.multiply(inverseBasisMatrix); //Cb * B^-1
+        double answer = Matrix.multiply(basisCoefficients, basisVectorsValues).getElement(0, 0); //z
+        Matrix inverseBasisCoefficients = Matrix.multiply(basisCoefficients, inverseBasisMatrix); //Cb * B^-1
 
-        Matrix deltas = inverseBasisCoefficients.multiply(nonBasicMatrix).subtract(nonBasicCoefficients); // zj - Cj
+        Matrix deltas = Matrix.multiply(inverseBasisCoefficients, nonBasicMatrix).subtract(nonBasicCoefficients); // zj - Cj
         int maxDeltaColumnIndex = maxDeltaColumnIndex(deltas);
 
         if(maxDeltaColumnIndex == -1){
@@ -186,7 +220,7 @@ public class Main {
 
         Matrix enteringVector = enteringVector(nonBasicMatrix, maxDeltaColumnIndex); //Pe
 
-        Matrix denominatorsForRatios = inverseBasisMatrix.multiply(enteringVector); //B^-1 * Pe
+        Matrix denominatorsForRatios = Matrix.multiply(inverseBasisMatrix, enteringVector); //B^-1 * Pe
         Matrix ratios = calculateRatios(basisVectorsValues, denominatorsForRatios);
         int minRatioRowIndex = minRatioRowIndex(ratios);
 
@@ -198,12 +232,12 @@ public class Main {
             swapCoefficients(basisCoefficients, nonBasicCoefficients, minRatioRowIndex, maxDeltaColumnIndex);
             swapColumns(basisMatrix, nonBasicMatrix, minRatioRowIndex, maxDeltaColumnIndex);
             inverseBasisMatrix = basisMatrix.inverse(); // B^-1
-            basisVectorsValues = inverseBasisMatrix.multiply(rightNumbers); //XB
-            answer = basisCoefficients.multiply(basisVectorsValues).getElement(0,0); //z
+            basisVectorsValues = Matrix.multiply(inverseBasisMatrix, rightNumbers); //XB
+            answer = Matrix.multiply(basisCoefficients, basisVectorsValues).getElement(0,0); //z
 
 
-            inverseBasisCoefficients = basisCoefficients.multiply(inverseBasisMatrix); //Cb * B^-1
-            deltas = inverseBasisCoefficients.multiply(nonBasicMatrix).subtract(nonBasicCoefficients); // zj - Cj
+            inverseBasisCoefficients = Matrix.multiply(basisCoefficients, inverseBasisMatrix); //Cb * B^-1
+            deltas = Matrix.multiply(inverseBasisCoefficients, nonBasicMatrix).subtract(nonBasicCoefficients); // zj - Cj
             maxDeltaColumnIndex = maxDeltaColumnIndex(deltas);
 
             if(maxDeltaColumnIndex == -1){
@@ -213,7 +247,7 @@ public class Main {
             enteringVector = enteringVector(nonBasicMatrix, maxDeltaColumnIndex); //Pe
 
 
-            denominatorsForRatios = inverseBasisMatrix.multiply(enteringVector); //B^-1 * Pe
+            denominatorsForRatios = Matrix.multiply(inverseBasisMatrix, enteringVector); //B^-1 * Pe
             ratios = calculateRatios(basisVectorsValues, denominatorsForRatios);
             minRatioRowIndex = minRatioRowIndex(ratios);
 
