@@ -9,7 +9,17 @@ public class Main {
      * @return A matrix containing a subset of columns from constraintsMatrix that construct identity matrix.
      */
     private static Matrix basisMatrix(Matrix constraintsMatrix) {
-        return null;
+        Matrix basMatrix = new Matrix(constraintsMatrix.getRows(), constraintsMatrix.getRows());
+        for(int i = 0; i < constraintsMatrix.getRows(); i++){
+            for(int j = 0; j < constraintsMatrix.getRows(); j++){
+                if(i == j){
+                    basMatrix.setElement(i, j, 1);
+                }else{
+                    basMatrix.setElement(i, j, 0);
+                }
+            }
+        }
+        return basMatrix;
     }
 
     /**
@@ -18,7 +28,23 @@ public class Main {
      * @return A matrix containing the columns from constraintsMatrix that not construct identity matrix
      */
     private static Matrix nonBasicMatrix(Matrix constraintsMatrix) {
-        return null;
+        int k = 0;
+        Matrix basMatrix = new Matrix(constraintsMatrix.getRows(), constraintsMatrix.getRows());
+        for(int j = 0; j < constraintsMatrix.getColumns(); j++){
+            int numb0 = 0, numb1 = 0;
+            for(int i = 0; i < constraintsMatrix.getRows(); i++){
+                basMatrix.setElement(i, k, constraintsMatrix.getElement(i, j));
+                if(constraintsMatrix.getElement(i, j) == 0){
+                    numb0++;
+                }else if(constraintsMatrix.getElement(i, j) == 1){
+                    numb1++;
+                }
+            }
+            if(!(numb1 == 1 && (numb0 + numb1) == constraintsMatrix.getRows())){
+                k++;
+            }
+        }
+        return basMatrix;
     }
 
     /**
@@ -86,7 +112,23 @@ public class Main {
      * @return Array List of indices of columns that construct the basis in the constraints matrix as in the example above.
      */
     private static List<Integer> basisVectorsIndices(Matrix constraintsMatrix) {
-        return null;
+        List<Integer> basisVIndices = new ArrayList<Integer>();
+        int k = 0;
+        for (int j = 0; j < constraintsMatrix.getColumns(); j++) {
+            int numb0 = 0, numb1 = 0;
+            for (int i = 0; i < constraintsMatrix.getRows(); i++) {
+                if (constraintsMatrix.getElement(i, j) == 0) {
+                    numb0++;
+                } else if (constraintsMatrix.getElement(i, j) == 1) {
+                    numb1++;
+                }
+            }
+            if ((numb1 == 1 && (numb0 + numb1) == constraintsMatrix.getRows())) {
+                basisVIndices.add(k, j);
+                k++;
+            }
+        }
+        return basisVIndices;
     }
 
     /**
@@ -104,7 +146,23 @@ public class Main {
      * @return Array List of indices of columns that not construct the basis in the constraints matrix as in the example above.
      */
     private static List<Integer> nonBasisVectorsIndices(Matrix constraintsMatrix) {
-        return null;
+        List<Integer> nonBasisVIndices = new ArrayList<Integer>();
+        int k = 0;
+        for (int j = 0; j < constraintsMatrix.getColumns(); j++) {
+            int numb0 = 0, numb1 = 0;
+            for (int i = 0; i < constraintsMatrix.getRows(); i++) {
+                if (constraintsMatrix.getElement(i, j) == 0) {
+                    numb0++;
+                } else if (constraintsMatrix.getElement(i, j) == 1) {
+                    numb1++;
+                }
+            }
+            if (!(numb1 == 1 && (numb0 + numb1) == constraintsMatrix.getRows())) {
+                nonBasisVIndices.add(k, j);
+                k++;
+            }
+        }
+        return nonBasisVIndices;
     }
 
     /**
