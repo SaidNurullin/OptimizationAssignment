@@ -13,8 +13,8 @@ public class Matrix {
         this.rows = m.rows;
         this.columns = m.columns;
         this.data = new double[rows][columns];
-        for (int i = 0; i < rows; i++){
-            for (int j = 0; j < columns; j++){
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < columns; j++) {
                 setElement(i, j, m.getElement(i, j));
             }
         }
@@ -149,13 +149,8 @@ public class Matrix {
             scale.setElement(i, i, 1 / input.getElement(i, i));
         }
 
-
         output = multiply(scale, output);
 
         return output;
     }
-
-
-
-
 }
