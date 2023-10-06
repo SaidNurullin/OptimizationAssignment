@@ -1,5 +1,8 @@
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
@@ -112,7 +115,9 @@ public class Main {
      * @return Array List of indices of columns that construct the basis in the constraints matrix as in the example above.
      */
     private static List<Integer> basisVectorsIndices(Matrix constraintsMatrix) {
-        List<Integer> basisVIndices = new ArrayList<Integer>();
+        Map<Integer,Integer> mapIndices = new HashMap<Integer,Integer>();
+        List<Integer> basisVIndices = new ArrayList<>();
+        List<Integer> listRow = new ArrayList<>();
         int k = 0;
         for (int j = 0; j < constraintsMatrix.getColumns(); j++) {
             int numb0 = 0, numb1 = 0;
@@ -120,13 +125,20 @@ public class Main {
                 if (constraintsMatrix.getElement(i, j) == 0) {
                     numb0++;
                 } else if (constraintsMatrix.getElement(i, j) == 1) {
+                    k  = i;
                     numb1++;
                 }
             }
             if ((numb1 == 1 && (numb0 + numb1) == constraintsMatrix.getRows())) {
-                basisVIndices.add(k, j);
+                listRow.add(k);
+                mapIndices.put(k, j);
                 k++;
             }
+        }
+        listRow.sort(Comparator.naturalOrder());
+        int size = listRow.size();
+        for(int i = 0; i < size; i++){
+            basisVIndices.add(i, mapIndices.get(listRow.get(i)));
         }
         return basisVIndices;
     }
