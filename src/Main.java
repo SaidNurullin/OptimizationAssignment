@@ -339,7 +339,7 @@ public class Main {
 
         printAnswer(basisCoefficients, basisVectorsIndices, basisVectorsValues, answer);
 
-
+        in.close();
     }
 
 
