@@ -113,15 +113,15 @@ public class Main {
     }
 
     /**
-     * Example:<br>
-     * constraintsMatrix =<br>
-     * 1 2 3 0 4 0<br>
-     * 0 6 4 0 1 1<br>
-     * 0 3 2 1 6 0<br>
-     * basis =<br>
-     * 1 0 0<br>
-     * 0 1 0<br>
-     * 0 0 1<br>
+     * Example:<br></br>
+     * constraintsMatrix =<br></br>
+     * 1 2 3 0 4 0<br></br>
+     * 0 6 4 0 1 1<br></br>
+     * 0 3 2 1 6 0<br></br>
+     * basis =<br></br>
+     * 1 0 0<br></br>
+     * 0 1 0<br></br>
+     * 0 0 1<br></br>
      * indices: {0, 5, 3}
      * 
      * @param constraintsMatrix A matrix representing the coefficients of the
