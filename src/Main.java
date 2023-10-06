@@ -204,6 +204,10 @@ public class Main {
      */
     private static void swapIndices(List<Integer> basisVectorsIndices, List<Integer> nonBasicVectorsIndices,
                                     int minRatioRowIndex, int maxDeltaColumnIndex) {
+        int a = basisVectorsIndices.get(minRatioRowIndex);
+        int b = nonBasicVectorsIndices.get(maxDeltaColumnIndex);
+        basisVectorsIndices.set(minRatioRowIndex, b);
+        nonBasicVectorsIndices.set(maxDeltaColumnIndex, a);
     }
 
     /**
@@ -215,6 +219,10 @@ public class Main {
      */
     private static void swapCoefficients(Matrix basisCoefficients, Matrix nonBasicCoefficients,
                                          int minRatioRowIndex, int maxDeltaColumnIndex) {
+        double a = basisCoefficients.getElement(minRatioRowIndex, 0);
+        double b = nonBasicCoefficients.getElement(maxDeltaColumnIndex, 0);
+        basisCoefficients.setElement(minRatioRowIndex, 0, b);
+        nonBasicCoefficients.setElement(maxDeltaColumnIndex, 0, a);
     }
 
     /**
@@ -226,6 +234,12 @@ public class Main {
      */
     private static void swapColumns(Matrix basisMatrix, Matrix nonBasicMatrix,
                                     int minRatioRowIndex, int maxDeltaColumnIndex) {
+        for (int i = 0; i < basisMatrix.getRows(); i++) {
+            double a = basisMatrix.getElement(i, minRatioRowIndex);
+            double b = nonBasicMatrix.getElement(i, maxDeltaColumnIndex);
+            basisMatrix.setElement(i, minRatioRowIndex, b);
+            nonBasicMatrix.setElement(i, maxDeltaColumnIndex, a);
+        }
     }
 
     /**
