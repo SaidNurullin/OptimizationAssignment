@@ -63,19 +63,35 @@ public class Main {
      * @return Coefficients corresponding to the basis columns
      */
     private static Matrix basisCoefficients(Matrix constraintsMatrix, Matrix coefficients) {
-        return null;
+        List<Integer> basicIndexes = basisVectorsIndices(constraintsMatrix);
+        int rows = 1;
+        Matrix matrix = new Matrix(rows, basicIndexes.size());
+        int k = 0;
+        for (Integer element : basicIndexes){
+            matrix.setElement(rows - 1, k, coefficients.getElement(rows - 1, k));
+            ++k;
+        }
+        return matrix;
     }
 
     /**
      *
+     * @param constraintsMatrix A matrix representing the coefficients of the
+     *                          constraints.
      * @param coefficients      A matrix representing the coefficients of the
      *                          objective function.
-     * @param basisCoefficients Coefficients corresponding to the basis columns
-     *                          (Cb).
      * @return Coefficients corresponding to the non-basic columns.
      */
-    private static Matrix nonBasicCoefficients(Matrix coefficients, Matrix basisCoefficients) {
-        return null;
+    private static Matrix nonBasicCoefficients(Matrix constraintsMatrix, Matrix coefficients) {
+        List<Integer> nonbasicIndexes = nonBasisVectorsIndices(constraintsMatrix);
+        int rows = 1;
+        Matrix matrix = new Matrix(rows, nonbasicIndexes.size());
+        int k = 0;
+        for (Integer element : nonbasicIndexes){
+            matrix.setElement(rows - 1, k, coefficients.getElement(rows - 1, k));
+            ++k;
+        }
+        return matrix;
     }
 
     /**
@@ -313,7 +329,7 @@ public class Main {
         Matrix nonBasicMatrix = nonBasicMatrix(constraintsMatrix); // P
         Matrix inverseBasisMatrix = basisMatrix.inverse(); // B^-1
         Matrix basisCoefficients = basisCoefficients(constraintsMatrix, coefficients); // Cb
-        Matrix nonBasicCoefficients = nonBasicCoefficients(coefficients, basisCoefficients); // Cp
+        Matrix nonBasicCoefficients = nonBasicCoefficients(constraintsMatrix, coefficients); // Cp
         Matrix basisVectorsValues = Matrix.multiply(inverseBasisMatrix, rightNumbers); // XB
         List<Integer> basisVectorsIndices = basisVectorsIndices(constraintsMatrix); // XBi
         List<Integer> nonBasicVectorsIndices = nonBasisVectorsIndices(constraintsMatrix); // XPi
