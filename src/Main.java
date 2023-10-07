@@ -219,7 +219,17 @@ public class Main {
      *         deltas, returns -1.
      */
     private static int maxDeltaColumnIndex(Matrix deltas) {
-        return 0;
+        double maxDelta = -1;
+        int res = -1;
+        for (int i = 0; i < deltas.getRows(); i++)
+        {
+            double deltaI = deltas.getElement(i, 0);
+            if (maxDelta < deltaI) {
+                maxDelta = deltaI;
+                res = i;
+            }
+        }
+        return res;
     }
 
     /**
@@ -228,7 +238,17 @@ public class Main {
      * @return The index of the row with the minimum ratio in ratios.
      */
     private static int minRatioRowIndex(Matrix ratios) {
-        return 0;
+        double minRatio = ratios.getElement(0, 0);
+        int res = 0;
+        for (int i = 0; i < ratios.getRows(); i++)
+        {
+            double ratioI = ratios.getElement(i, 0);
+            if (minRatio > ratioI) {
+                minRatio = ratioI;
+                res = i;
+            }
+        }
+        return res;
     }
 
     /**
@@ -299,6 +319,12 @@ public class Main {
      */
     private static void printAnswer(Matrix basisCoefficients, List<Integer> basisVectorsIndices,
             Matrix basisVectorsValues, double answer) {
+        for (int i = 0; i < basisCoefficients.getRows(); i++)
+        {
+            if (basisCoefficients.getElement(i, 0) != 0)
+                System.out.println("x" + i + " = " + basisVectorsValues.getElement(i, 0));
+        }
+        System.out.println("z = " + answer);
     }
 
     public static void main(String[] args) {
