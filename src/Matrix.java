@@ -13,8 +13,8 @@ public class Matrix {
         this.rows = m.rows;
         this.columns = m.columns;
         this.data = new double[rows][columns];
-        for (int i = 0; i < rows; i++){
-            for (int j = 0; j < columns; j++){
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < columns; j++) {
                 setElement(i, j, m.getElement(i, j));
             }
         }
@@ -42,6 +42,16 @@ public class Matrix {
 
     private void setRow(int idx, double[] row) {
         data[idx] = row;
+    }
+
+    public Matrix transpose(){
+        Matrix result = new Matrix(getColumns(), getRows());
+        for(int i = 0; i<result.getRows(); i++){
+            for(int j = 0; j<result.getColumns(); j++){
+                result.setElement(i, j, getElement(j, i));
+            }
+        }
+        return result;
     }
 
     public Matrix subtract(Matrix other) {
@@ -149,13 +159,8 @@ public class Matrix {
             scale.setElement(i, i, 1 / input.getElement(i, i));
         }
 
-
         output = multiply(scale, output);
 
         return output;
     }
-
-
-
-
 }
