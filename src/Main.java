@@ -15,16 +15,32 @@ public class Main {
      *         construct identity matrix.
      */
     private static Matrix basisMatrix(Matrix constraintsMatrix) {
+        int k = 0;
+        int idx = 0;
+        Matrix currentColumn = new Matrix(constraintsMatrix.getRows(), 1);
         Matrix basMatrix = new Matrix(constraintsMatrix.getRows(), constraintsMatrix.getRows());
-        for (int i = 0; i < constraintsMatrix.getRows(); i++) {
-            for (int j = 0; j < constraintsMatrix.getRows(); j++) {
-                if (i == j) {
-                    basMatrix.setElement(i, j, 1);
-                } else {
-                    basMatrix.setElement(i, j, 0);
+        for (int j = 0; j < constraintsMatrix.getColumns(); j++) {
+            int numb0 = 0, numb1 = 0;
+            for (int i = 0; i < constraintsMatrix.getRows(); i++) {
+                currentColumn.setElement(i, 0, constraintsMatrix.getElement(i, j));
+                if (constraintsMatrix.getElement(i, j) == 0) {
+                    numb0++;
+                } else if (constraintsMatrix.getElement(i, j) == 1) {
+                    numb1++;
+                    idx = i;
+                }
+            }
+            if (numb1 == 1 && (numb0 + numb1) == constraintsMatrix.getRows()) {
+                for (int i = 0; i < currentColumn.getRows(); i++){
+                    basMatrix.setElement(i, idx, currentColumn.getElement(i, 0));
+                }
+                k++;
+                if(k == basMatrix.getRows()){
+                    break;
                 }
             }
         }
+
         return basMatrix;
     }
 
@@ -39,7 +55,7 @@ public class Main {
         int k = 0;
         Matrix currentColumn = new Matrix(constraintsMatrix.getRows(), 1);
         Matrix basMatrix = new Matrix(constraintsMatrix.getRows(), constraintsMatrix.getColumns() - constraintsMatrix.getRows());
-        for (int j = 0; j < basMatrix.getColumns(); j++) {
+        for (int j = 0; j < constraintsMatrix.getColumns(); j++) {
             int numb0 = 0, numb1 = 0;
             for (int i = 0; i < constraintsMatrix.getRows(); i++) {
                 currentColumn.setElement(i, 0, constraintsMatrix.getElement(i, j));
@@ -243,12 +259,12 @@ public class Main {
      * @return The index of the row with the minimum ratio in ratios.
      */
     private static int minRatioRowIndex(Matrix ratios) {
-        double minRatio = ratios.getElement(0, 0);
-        int res = 0;
+        double minRatio = Double.MAX_VALUE;
+        int res = -1;
         for (int i = 0; i < ratios.getRows(); i++)
         {
             double ratioI = ratios.getElement(i, 0);
-            if (minRatio > ratioI) {
+            if (minRatio > ratioI && ratioI >= 0) {
                 minRatio = ratioI;
                 res = i;
             }
@@ -350,13 +366,21 @@ public class Main {
 
         Scanner in = new Scanner(System.in);
 
-        Matrix coefficients = new Matrix(5, 1); // c
+        System.out.println("Is it max or min problem? (0 for min, 1 for max)");
+        int typeOfProblem = in.nextInt();
+        System.out.println("Number of rows in the matrix of coefficients of constraint function - A:");
+        int rows = in.nextInt();
+        System.out.println("Number of columns in the matrix of coefficients of constraint function - A:");
+        int columns = in.nextInt();
+        System.out.println("A vector of coefficients of objective function - C:");
+        Matrix coefficients = new Matrix(columns, 1); // c
 
         for (int i = 0; i < coefficients.getRows(); i++) {
             coefficients.setElement(i, 0, in.nextFloat());
         }
 
-        Matrix constraintsMatrix = new Matrix(3, 5); // A
+        System.out.println("A matrix of coefficients of constraint function - A:");
+        Matrix constraintsMatrix = new Matrix(rows, columns); // A
 
         for (int i = 0; i < constraintsMatrix.getRows(); i++) {
             for (int j = 0; j < constraintsMatrix.getColumns(); j++) {
@@ -364,15 +388,37 @@ public class Main {
             }
         }
 
-        Matrix rightNumbers = new Matrix(3, 1); // b
+        System.out.println("A vector of right-hand side numbers - b:");
+        Matrix rightNumbers = new Matrix(rows, 1); // b
 
         for (int i = 0; i < rightNumbers.getRows(); i++) {
             rightNumbers.setElement(i, 0, in.nextFloat());
         }
 
+        System.out.println("The approximation accuracy (integer number representing the number of decimal places):");
         int accuracy = in.nextInt();
 
+        if(typeOfProblem == 1){
+            for (int i = 0; i < coefficients.getRows(); i++){
+                if(coefficients.getElement(i, 0) != 0.0){
+                coefficients.setElement(i, 0, -1*coefficients.getElement(i, 0));
+                }
+            }
+        }
+
         Matrix basisMatrix = basisMatrix(constraintsMatrix); // B
+        Matrix identity = new Matrix(constraintsMatrix.getRows(), constraintsMatrix.getRows());
+        for (int i = 0; i < constraintsMatrix.getRows(); i++) {
+            identity.setElement(i, i, 1);
+        }
+        for (int i = 0; i < basisMatrix.getRows(); i++){
+            for (int j = 0; j < basisMatrix.getColumns(); j++){
+                if(basisMatrix.getElement(i, j) != identity.getElement(i, j)){
+                    System.out.println("The method is not applicable!");
+                    return;
+                }
+            }
+        }
         Matrix nonBasicMatrix = nonBasicMatrix(constraintsMatrix); // P
         Matrix inverseBasisMatrix = basisMatrix.inverse(); // B^-1
         Matrix basisCoefficients = basisCoefficients(constraintsMatrix, coefficients); // Cb
@@ -399,6 +445,10 @@ public class Main {
         Matrix denominatorsForRatios = Matrix.multiply(inverseBasisMatrix, enteringVector); // B^-1 * Pe
         Matrix ratios = calculateRatios(basisVectorsValues, denominatorsForRatios);
         int minRatioRowIndex = minRatioRowIndex(ratios);
+        if (minRatioRowIndex == -1){
+            System.out.println("The method is not applicable!");
+            return;
+        }
 
         while (true) {
             swapIndices(basisVectorsIndices, nonBasicVectorsIndices, minRatioRowIndex, maxDeltaColumnIndex);
@@ -427,9 +477,16 @@ public class Main {
             denominatorsForRatios = Matrix.multiply(inverseBasisMatrix, enteringVector); // B^-1 * Pe
             ratios = calculateRatios(basisVectorsValues, denominatorsForRatios);
             minRatioRowIndex = minRatioRowIndex(ratios);
+            if (minRatioRowIndex == -1){
+                System.out.println("The method is not applicable!");
+                return;
+            }
 
         }
         basisCoefficients = basisCoefficients.transpose();
+        if(typeOfProblem == 1){
+            answer = -answer;
+        }
         printAnswer(basisCoefficients, basisVectorsIndices, basisVectorsValues, answer, accuracy);
 
         in.close();
